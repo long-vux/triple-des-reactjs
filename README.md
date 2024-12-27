@@ -24,18 +24,22 @@ A modern React application that implements Triple DES encryption for text and fi
 1. Clone the repository:
 ```bash
 git clone https://github.com/long-vux/triple-des-reactjs.git
+```
 
 2. Navigate to project directory:
 ```bash
 cd triple-des-reactjs
+```
 
 3. Install dependencies:
 ```bash
 npm install
+```
 
 4. Start the development server:
 ```bash
 npm start
+```
 
 The application will open in your default browser at `http://localhost:3000`
 
