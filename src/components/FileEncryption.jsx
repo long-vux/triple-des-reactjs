@@ -33,6 +33,9 @@ function FileEncryption({ fileType }) {
     } else if (!encryptKey) {
       setEncryptError("Please provide a key!");
       return;
+    } else if (encryptKey.length !== 24) {
+      setEncryptError("Key must be exactly 24 characters (192 bits).");
+      return;
     }
 
     function getMimeType(base64String) {
@@ -73,6 +76,10 @@ function FileEncryption({ fileType }) {
   };
 
   const decryptFile = () => {
+    if (imageUrl || videoUrl) {
+      URL.revokeObjectURL(imageUrl);
+      URL.revokeObjectURL(videoUrl);
+    }
     if (!file) {
       setDecryptError("Please select a file!");
       return;
@@ -116,6 +123,10 @@ function FileEncryption({ fileType }) {
     reader.readAsText(file); // Read file as text
   };
 
+  const isValidTripleDESKey = (key) => {
+    return key.length === 24; // Kiểm tra khóa có đúng 24 ký tự không
+  };
+
   return (
     <div>
       <div className="flex flex-col lg:flex-row gap-8 mb-8">
@@ -123,22 +134,31 @@ function FileEncryption({ fileType }) {
         <div className="w-full lg:w-1/2">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">{fileType} Encryption</h2>
           <input type="file" onChange={handleFileChange} />
-          <div className="flex flex-row gap-2 mt-4">
+          <div className="flex flex-row gap-2 mt-4 ">
             <input
               type="text"
+              className={`w-full p-2 border ${encryptError ? "border-red-500" : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-2 ${encryptError ? "focus:ring-red-400" : "focus:ring-blue-400"
+                }`}
               placeholder="Enter encryption key"
               value={encryptKey}
               onChange={(e) => {
-                setEncryptKey(e.target.value);
-                setEncryptError("");
+                const key = e.target.value;
+                setEncryptKey(key);
+                if (!isValidTripleDESKey(key)) {
+                  setEncryptError("Key must be exactly 24 characters (192 bits).");
+                } else {
+                  setEncryptError("");
+                }
               }}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
             <button
               className="bg-green-500 text-white text-sm font-medium py-1 rounded-md hover:bg-green-600 w-[100px]"
-              onClick={() =>
-                setEncryptKey(CryptoJS.MD5(Math.random().toString()).toString())
-              }
+              onClick={() => {
+                const randomKey = CryptoJS.MD5(Math.random().toString()).toString().substring(0, 24);
+                setEncryptKey(randomKey);
+                setEncryptError("");
+              }}
             >
               Random
             </button>
