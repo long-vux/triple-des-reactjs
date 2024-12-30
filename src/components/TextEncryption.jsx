@@ -14,7 +14,7 @@ function TextEncryption() {
   const encryptText = () => {
     if (!encryptKey) {
       setEncryptError("Please provide a key!");
-      return; 
+      return;
     } else if (!encryptPlaintext) {
       setEncryptError("Please provide plaintext!");
       return;
@@ -54,6 +54,12 @@ function TextEncryption() {
     return key.length === 24; // Kiểm tra khóa có đúng 24 ký tự không
   };
 
+  function generateKey() {
+    const array = new Uint8Array(21); // 7 bytes = 56 bits => 21 bytes = 168 bits
+    window.crypto.getRandomValues(array);
+    return Array.from(array).map(byte => byte.toString(16).padStart(2, '0')).join('');
+  }
+
   return (
     <div className="flex flex-col lg:flex-row gap-8">
       {/* Encryption Section */}
@@ -89,7 +95,7 @@ function TextEncryption() {
           <button
             className="bg-green-500 text-white text-sm font-medium py-1 rounded-md hover:bg-green-600 w-[100px]"
             onClick={() => {
-              const randomKey = CryptoJS.MD5(Math.random().toString()).toString().substring(0, 24);
+              const randomKey = generateKey()
               setEncryptKey(randomKey);
               setEncryptError("");
             }}
