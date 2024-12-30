@@ -18,9 +18,6 @@ function TextEncryption() {
     } else if (!encryptPlaintext) {
       setEncryptError("Please provide plaintext!");
       return;
-    } else if (!isValidTripleDESKey(encryptKey)) {
-      setEncryptError("Key must be exactly 24 characters (192 bits).");
-      return;
     }
     const encrypted = CryptoJS.TripleDES.encrypt(encryptPlaintext, encryptKey).toString();
     if (!encrypted) {
@@ -48,10 +45,6 @@ function TextEncryption() {
     } catch (error) {
       setDecryptError("Decryption failed! Check your key or ciphertext.");
     }
-  };
-
-  const isValidTripleDESKey = (key) => {
-    return key.length === 24; // Kiểm tra khóa có đúng 24 ký tự không
   };
 
   function generateKey() {
@@ -85,11 +78,6 @@ function TextEncryption() {
             onChange={(e) => {
               const key = e.target.value;
               setEncryptKey(key);
-              if (!isValidTripleDESKey(key)) {
-                setEncryptError("Key must be exactly 24 characters (192 bits).");
-              } else {
-                setEncryptError("");
-              }
             }}
           />
           <button

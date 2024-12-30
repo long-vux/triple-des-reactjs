@@ -33,10 +33,7 @@ function FileEncryption({ fileType }) {
     } else if (!encryptKey) {
       setEncryptError("Please provide a key!");
       return;
-    } else if (encryptKey.length !== 24) {
-      setEncryptError("Key must be exactly 24 characters (192 bits).");
-      return;
-    }
+    } 
 
     function getMimeType(base64String) {
       const match = base64String.match(/^data:(.+?);base64,/);
@@ -123,9 +120,11 @@ function FileEncryption({ fileType }) {
     reader.readAsText(file); // Read file as text
   };
 
-  const isValidTripleDESKey = (key) => {
-    return key.length === 24; // Kiểm tra khóa có đúng 24 ký tự không
-  };
+  function generateKey() {
+    const array = new Uint8Array(21); // 7 bytes = 56 bits => 21 bytes = 168 bits
+    window.crypto.getRandomValues(array);
+    return Array.from(array).map(byte => byte.toString(16).padStart(2, '0')).join('');
+  }
 
   return (
     <div>
@@ -145,17 +144,12 @@ function FileEncryption({ fileType }) {
               onChange={(e) => {
                 const key = e.target.value;
                 setEncryptKey(key);
-                if (!isValidTripleDESKey(key)) {
-                  setEncryptError("Key must be exactly 24 characters (192 bits).");
-                } else {
-                  setEncryptError("");
-                }
               }}
             />
             <button
               className="bg-green-500 text-white text-sm font-medium py-1 rounded-md hover:bg-green-600 w-[100px]"
               onClick={() => {
-                const randomKey = CryptoJS.MD5(Math.random().toString()).toString().substring(0, 24);
+                const randomKey = generateKey()
                 setEncryptKey(randomKey);
                 setEncryptError("");
               }}
